@@ -1,0 +1,13 @@
+name: BalticReferral
+version: '${project.version}'
+main: lt.tomexas.balticreferral.Main
+api-version: 1.18
+depend:
+  - PlaceholderAPI
+commands:
+  ref:
+    description: Lets you use a referral on a friend
+  reftop:
+    description: Shows a list of top 5 referral players
+  link:
+    description: Generates a code to link your discord account to minecraft

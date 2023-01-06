@@ -1,0 +1,50 @@
+#Placeholders for top list: [%referral_top_<1-5>_name%/%referral_top_<1-5>_points%]
+#Placeholders for player: [%referral_points%]
+database:
+  db_host: ""
+  db_user: ""
+  db_password: ""
+  db_table: ""
+
+messages:
+  prefix: "&b&lʀᴇғᴇʀʀᴀʟ &8&l┃ &7"
+  usage: "%prefix%Usage: &f/ref <player>."
+  player_points: "%prefixYou currently have &b%points% &7referral points."
+  player_offline: "%prefix%&The player is not online."
+  used: "%prefix%You already used a referral for this server."
+  discord_unlinked: "%prefix%Please link your Discord account with your minecraft user in order to use the referral system. Use &b/link &7to link your accounts."
+  referral_discord_unlinked: "%prefix%The referral player has not yet linked its Discord account to the server."
+  playtime: "%prefix%You need to play for atleast &b30minutes&7 to use the referral system."
+  self_use: "%prefix%You cannot use your own referral."
+  you_used: "%prefix%You used &b%arg_player% &7referral."
+  player_used: "%prefix%A player &b%player% &7has used your referral."
+  referral_top_list: "&b&lʀᴇғᴇʀʀᴀʟ ᴛᴏᴘ ʟɪsᴛ:"
+  list_empty: "&8 ■ &7This list is currently empty!"
+  list_player: "&8■ &7%n%. &8- &f%list_player% &8| &b%points%"
+  update_interval: "&8 ▶ &7Top list updates every &b5minutes&7."
+  player_only: "&cThis command can only be executed by a player!"
+  discord_link_msg: "&b&lᴅɪsᴄᴏʀᴅ &8&l┃ &7Type this code [&b%code%&7] in channel [&b%text-channel-name%&7] to link your account to discord. The code will be available for &b5minutes&7."
+  discord_account_linked_to: "&b&lᴅɪsᴄᴏʀᴅ &8&l┃ &7Account linked to - &b%dc-user%"
+  discord_already_linked: "&b&lᴅɪsᴄᴏʀᴅ &8&l┃ &7You've already linked your minecraft account to &b%dc-user%"
+  discord_code_expired: "&b&lᴅɪsᴄᴏʀᴅ &8&l┃ &7Your discord link code has expired!"
+  discord_link_code_exist: "&b&lᴅɪsᴄᴏʀᴅ &8&l┃ &7The code was already generated, current code is [&b%code%&7]"
+
+config:
+  update_interval: "300" #5 minutes in seconds
+  playtime: "1800" #30minutes in seconds
+
+placeholders:
+  no_name: "XXX"
+  no_points: "X"
+
+discord:
+  token: ""
+  activity_playing: "(%online%/%max_online%)"
+  text_channel_id: ""
+  code_availability: "300" #5minutes in seconds
+  success_color: 0x00FF00
+  error_color: 0xFF0000
+  success_text: "Account successfully linked to - %player%"
+  error_text: "The specified code does not exist!"
+  account_already_linked: "This account is already linked to a different player!"
+
