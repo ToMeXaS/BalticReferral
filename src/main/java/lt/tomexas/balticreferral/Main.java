@@ -12,6 +12,7 @@ import lt.tomexas.balticreferral.listeners.PlayerJoinLeaveListener;
 import lt.tomexas.balticreferral.placeholders.ReferralExpansion;
 import lt.tomexas.balticreferral.schedulers.PlayTimeScheduler;
 import lt.tomexas.balticreferral.schedulers.TopListUpdateScheduler;
+import lt.tomexas.balticreferral.utils.enums.*;
 import lt.tomexas.balticreferral.utils.PlayerInfo;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Bukkit;
@@ -34,13 +35,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
     private static final HashMap<UUID, String> codes = new HashMap<>();
     private static final HashMap<UUID, Integer> tasks = new HashMap<>();
 
-    private File configFile;
     private static YamlConfiguration config;
-    private static final HashMap<String, String> messages = new HashMap<>();
-    private static final HashMap<String, String> db_data = new HashMap<>();
-    private static final HashMap<String, String> cfg = new HashMap<>();
-    private static final HashMap<String, String> placeholders = new HashMap<>();
-    private static final HashMap<String, String> discord = new HashMap<>();
 
     public void onEnable() {
 
@@ -65,14 +60,14 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         try {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 playerInfo.put(player.getUniqueId(), database.getPlayerInfoFromDatabase(player));
-                if (playerInfo.get(player.getUniqueId()).getPlaytime() < Integer.parseInt(cfg.get("playtime")))
+                if (playerInfo.get(player.getUniqueId()).getPlaytime() < Integer.parseInt(ConfigEnum.PLAYTIME.toString()))
                     new PlayTimeScheduler(player).runTaskTimer(this, 0, 20L);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        new TopListUpdateScheduler().runTaskTimer(this, 0L, Integer.parseInt(cfg.get("update_interval")) * 20L);
+        new TopListUpdateScheduler().runTaskTimer(this, 0L, Integer.parseInt(ConfigEnum.UPDATE_INTERVAL.toString()) * 20L);
 
 
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -94,7 +89,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
     }
 
     private void createConfig() {
-        configFile = new File(getDataFolder(), "config.yml");
+        File configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists())
             saveResource("config.yml", false);
 
@@ -108,28 +103,35 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
     }
 
     private void retrieveDataFromConfig() {
-        for (String key : config.getConfigurationSection("messages").getKeys(false))
-            messages.put(key, config.getString("messages." + key));
-
-        for (Map.Entry<String, String> msg : messages.entrySet()) {
-            if (msg.getValue().contains("%prefix%")) {
-                String message = msg.getValue();
-                message = message.replace("%prefix%", messages.get("prefix"));
-                messages.replace(msg.getKey(), message);
+        for (MessagesEnum msg : MessagesEnum.values())
+            for (String key : config.getConfigurationSection("messages").getKeys(false)) {
+                if (!msg.name().equalsIgnoreCase(key)) continue;
+                msg.setValue(config.getString("messages." + key));
             }
-        }
 
-        for (String key : config.getConfigurationSection("database").getKeys(false))
-            db_data.put(key, config.getString("database." + key));
+        for (DatabaseEnum db : DatabaseEnum.values())
+            for (String key : config.getConfigurationSection("database").getKeys(false)) {
+                if (!db.name().equalsIgnoreCase(key)) continue;
+                db.setValue(config.getString("database." + key));
+            }
 
-        for (String key : config.getConfigurationSection("config").getKeys(false))
-            cfg.put(key, config.getString("config." + key));
+        for (ConfigEnum cfg : ConfigEnum.values())
+            for (String key : config.getConfigurationSection("config").getKeys(false)) {
+                if (!cfg.name().equalsIgnoreCase(key)) continue;
+                cfg.setValue(config.getString("config." + key));
+            }
 
-        for (String key : config.getConfigurationSection("placeholders").getKeys(false))
-            placeholders.put(key, config.getString("placeholders." + key));
+        for (PlaceholderEnum ph : PlaceholderEnum.values())
+            for (String key : config.getConfigurationSection("placeholders").getKeys(false)) {
+                if (!ph.name().equalsIgnoreCase(key)) continue;
+                ph.setValue(config.getString("placeholders." + key));
+            }
 
-        for (String key : config.getConfigurationSection("discord").getKeys(false))
-            discord.put(key, config.getString("discord." + key));
+        for (DiscordEnum dc : DiscordEnum.values())
+            for (String key : config.getConfigurationSection("discord").getKeys(false)) {
+                if (!dc.name().equalsIgnoreCase(key)) continue;
+                dc.setValue(config.getString("discord." + key));
+            }
     }
 
     public static HashMap<UUID, PlayerInfo> getPlayerInfo() {
@@ -152,26 +154,6 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         return database;
     }
 
-    public static HashMap<String, String> getDb_data() {
-        return db_data;
-    }
-
-    public static HashMap<String, String> getMessages() {
-        return messages;
-    }
-
-    public static HashMap<String, String> getCfg() {
-        return cfg;
-    }
-
-    public static HashMap<String, String> getPlaceholders() {
-        return placeholders;
-    }
-
-    public static HashMap<String, String> getDiscord() {
-        return discord;
-    }
-
     public static JDA getBot() {
         return bot;
     }
@@ -186,5 +168,9 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
 
     public static HashMap<UUID, Integer> getTasks() {
         return tasks;
+    }
+
+    public static YamlConfiguration getYaml() {
+        return config;
     }
 }

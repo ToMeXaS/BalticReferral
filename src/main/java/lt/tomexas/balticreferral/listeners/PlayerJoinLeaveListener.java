@@ -2,6 +2,7 @@ package lt.tomexas.balticreferral.listeners;
 
 import lt.tomexas.balticreferral.Main;
 import lt.tomexas.balticreferral.schedulers.PlayTimeScheduler;
+import lt.tomexas.balticreferral.utils.enums.ConfigEnum;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +23,7 @@ public class PlayerJoinLeaveListener implements Listener {
             e.printStackTrace();
         }
 
-        if (Main.getPlayerInfo().get(player.getUniqueId()).getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
+        if (Main.getPlayerInfo().get(player.getUniqueId()).getPlaytime() < Integer.parseInt(ConfigEnum.PLAYTIME.toString()))
             new PlayTimeScheduler(player).runTaskTimer(Main.getInstance(), 0, 20L);
     }
 

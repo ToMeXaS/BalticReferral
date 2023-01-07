@@ -2,6 +2,7 @@ package lt.tomexas.balticreferral.db;
 
 import lt.tomexas.balticreferral.Main;
 import lt.tomexas.balticreferral.utils.PlayerInfo;
+import lt.tomexas.balticreferral.utils.enums.DatabaseEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -18,10 +19,10 @@ public class Database {
         if (connection != null)
             return connection;
 
-        String host = Main.getDb_data().get("db_host");
-        String table = Main.getDb_data().get("db_table");
-        String user = Main.getDb_data().get("db_user");
-        String password = Main.getDb_data().get("db_password");
+        String host = DatabaseEnum.DB_HOST.toString();
+        String table = DatabaseEnum.DB_TABLE.toString();
+        String user = DatabaseEnum.DB_USER.toString();
+        String password = DatabaseEnum.DB_PASSWORD.toString();
 
         String url = "jdbc:mysql://"+ host +"/" + table;
         this.connection = DriverManager.getConnection(url, user, password);

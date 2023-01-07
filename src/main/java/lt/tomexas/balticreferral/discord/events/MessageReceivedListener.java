@@ -1,6 +1,8 @@
 package lt.tomexas.balticreferral.discord.events;
 
 import lt.tomexas.balticreferral.Main;
+import lt.tomexas.balticreferral.utils.enums.DiscordEnum;
+import lt.tomexas.balticreferral.utils.enums.MessagesEnum;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -24,11 +26,11 @@ public class MessageReceivedListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (!event.getAuthor().isBot()) {
             if (event.isFromType(ChannelType.TEXT)) {
-                if (event.getChannel().asTextChannel().getId().equals(Main.getDiscord().get("text_channel_id"))) {
+                if (event.getChannel().asTextChannel().getId().equals(DiscordEnum.TEXT_CHANNEL_ID.toString())) {
                     UUID uuid = codeExist(event.getMessage().getContentRaw());
                     if (uuid == null) {
                         MessageEmbed messageEmbed = new MessageEmbed(
-                                null, null, Main.getDiscord().get("error_text"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
+                                null, null, DiscordEnum.ERROR_TEXT.toString(), EmbedType.UNKNOWN, null, Integer.parseInt(DiscordEnum.ERROR_COLOR.toString()), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
                         event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
@@ -36,7 +38,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                         Player player = Bukkit.getPlayer(uuid);
                         if (player == null) return;
                         MessageEmbed messageEmbed = new MessageEmbed(
-                                null, null, Main.getDiscord().get("account_already_linked"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
+                                null, null, DiscordEnum.ACCOUNT_ALREADY_LINKED.toString(), EmbedType.UNKNOWN, null, Integer.parseInt(DiscordEnum.ERROR_COLOR.toString()), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
                         event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
@@ -47,15 +49,15 @@ public class MessageReceivedListener extends ListenerAdapter {
                     } else {
                         Player player = Bukkit.getPlayer(uuid);
                         if (player == null) return;
-                        String discord_msg = Main.getDiscord().get("success_text");
+                        String discord_msg = DiscordEnum.SUCCESS_TEXT.toString();
                         discord_msg = discord_msg.replace("%player%", player.getName());
                         MessageEmbed messageEmbed = new MessageEmbed(
-                                null, null, discord_msg, EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("success_color")), null, null, null, null, null, null, null
+                                null, null, discord_msg, EmbedType.UNKNOWN, null, Integer.parseInt(DiscordEnum.SUCCESS_COLOR.toString()), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
                         event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
 
-                        String server_msg = Main.getMessages().get("discord_account_linked_to");
+                        String server_msg = MessagesEnum.DISCORD_ACCOUNT_LINKED_TO.toString();
                         server_msg = server_msg.replace("%dc-user%", event.getAuthor().getAsTag());
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', server_msg));
 

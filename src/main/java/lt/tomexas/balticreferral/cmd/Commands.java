@@ -1,6 +1,9 @@
 package lt.tomexas.balticreferral.cmd;
 
 import lt.tomexas.balticreferral.Main;
+import lt.tomexas.balticreferral.utils.enums.ConfigEnum;
+import lt.tomexas.balticreferral.utils.enums.DiscordEnum;
+import lt.tomexas.balticreferral.utils.enums.MessagesEnum;
 import lt.tomexas.balticreferral.utils.PlayerInfo;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,7 +17,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.w3c.dom.Text;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,18 +33,18 @@ public class Commands implements CommandExecutor, TabCompleter {
             if (label.equalsIgnoreCase("ref")) {
                 if (player.getAddress() == null) return false;
                 if (args.length == 0) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("usage")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.USAGE.toString()));
                     return false;
                 }
                 if (args[0].equalsIgnoreCase("points")) {
-                    String msg = Main.getMessages().get("player_points");
+                    String msg = MessagesEnum.PLAYER_POINTS.toString();
                     msg = msg.replace("%points%", String.valueOf(playerInfo.getPoints()));
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
                     return false;
                 }
                 Player referralPlayer = Bukkit.getPlayer(args[0]);
                 if (referralPlayer == null) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("player_offline")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.PLAYER_OFFLINE.toString()));
                     return false;
                 }
 
@@ -50,27 +52,28 @@ public class Commands implements CommandExecutor, TabCompleter {
 
                 String discordID = playerInfo.getDiscordId();
                 String referralDcId = referralPInfo.getDiscordId();
-                if (dupeIPCheck(player.getAddress().getAddress().toString())) player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("used")));
+                if (dupeIPCheck(player.getAddress().getAddress().toString()))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.USED.toString()));
                 else if (discordID.isEmpty())
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("discord_unlinked")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.DISCORD_UNLINKED.toString()));
                 else if (referralDcId == null)
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("referral_discord_unlinked")));
-                else if (playerInfo.getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("playtime")));
-                else if (referralPInfo.getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("referral_playtime")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.REFERRAL_DISCORD_UNLINKED.toString()));
+                else if (playerInfo.getPlaytime() < Integer.parseInt(ConfigEnum.PLAYTIME.toString()))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.PLAYTIME.toString()));
+                else if (referralPInfo.getPlaytime() < Integer.parseInt(ConfigEnum.PLAYTIME.toString()))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.REFERRAL_PLAYTIME.toString()));
                 else if (referralPlayer.equals(player))
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("self_use")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.SELF_USE.toString()));
                 else {
                     referralPInfo.setPoints(referralPInfo.getPoints() + 1);
 
                     playerInfo.setIp(player.getAddress().getAddress().toString());
 
-                    String you_used = Main.getMessages().get("you_used");
+                    String you_used = MessagesEnum.YOU_USED.toString();
                     you_used = you_used.replace("%arg_player%", referralPlayer.getName());
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', you_used));
 
-                    String player_used = Main.getMessages().get("player_used");
+                    String player_used = MessagesEnum.PLAYER_USED.toString();
                     player_used = player_used.replace("%player%", player.getName());
                     referralPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', player_used));
 
@@ -79,52 +82,51 @@ public class Commands implements CommandExecutor, TabCompleter {
             }
 
             if (label.equalsIgnoreCase("reftop")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("referral_top_list")));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.REFERRAL_TOP_LIST.toString()));
                 if (Main.getTopList().size() == 0)
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("list_empty")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.LIST_EMPTY.toString()));
                 else {
                     int i = 0;
                     for (PlayerInfo info : Main.getTopList()) {
                         i++;
-                        String list_player = Main.getMessages().get("list_player");
+                        String list_player = MessagesEnum.LIST_PLAYER.toString();
                         list_player = list_player.replace("%n%", String.valueOf(i))
                                 .replace("%list_player%", info.getName())
                                 .replace("%points%", String.valueOf(info.getPoints()));
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', list_player));
                     }
 
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            Main.getMessages().get("update_interval")));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.UPDATE_INTERVAL.toString()));
                 }
             }
 
             if (label.equalsIgnoreCase("link")) {
                 if (!Main.getPlayerInfo().get(player.getUniqueId()).getDiscordId().isEmpty()) {
-                    String msg = Main.getMessages().get("discord_already_linked");
+                    String msg = MessagesEnum.DISCORD_ACCOUNT_ALREADY_LINKED.toString();
                     msg = msg.replace("%dc-user%", Main.getPlayerInfo().get(player.getUniqueId()).getDiscordName());
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
                 } else if (Main.getCodes().containsKey(player.getUniqueId())) {
-                    String msg = Main.getMessages().get("discord_link_code_exist");
+                    String msg = MessagesEnum.DISCORD_CODE_EXISTS.toString();
                     msg = msg.replace("%code%", Main.getCodes().get(player.getUniqueId()));
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
                 } else {
                     String code = getNewCode();
                     Main.getCodes().put(player.getUniqueId(), code);
 
-                    String discord_link_msg = Main.getMessages().get("discord_link_msg");
+                    String discord_link_msg = MessagesEnum.DISCORD_LINK_MSG.toString();
                     discord_link_msg = discord_link_msg.replace("%code%", code)
-                            .replace("%text-channel-name%", Main.getBot().getChannelById(TextChannel.class, Main.getDiscord().get("text_channel_id")).getName());
+                            .replace("%text-channel-name%", Main.getBot().getChannelById(TextChannel.class, DiscordEnum.TEXT_CHANNEL_ID.toString()).getName());
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', discord_link_msg));
 
                     Main.getTasks().put(player.getUniqueId(), Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                         Main.getCodes().remove(player.getUniqueId());
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("discord_code_expired")));
-                    }, Integer.parseInt(Main.getDiscord().get("code_availability")) * 20L).getTaskId());
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.DISCORD_CODE_EXPIRED.toString()));
+                    }, Integer.parseInt(DiscordEnum.CODE_AVAILABILITY.toString()) * 20L).getTaskId());
                 }
             }
 
         } else {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("player_only")));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', MessagesEnum.PLAYER_ONLY.toString()));
         }
         return false;
     }
@@ -154,7 +156,7 @@ public class Commands implements CommandExecutor, TabCompleter {
     }
 
     private void logToDiscord(PlayerInfo player, PlayerInfo referralPlayer) {
-        TextChannel textChannel = Main.getBot().getTextChannelById("1060976920768028722");
+        TextChannel textChannel = Main.getBot().getTextChannelById(DiscordEnum.LOG_CHANNEL_ID.toString());
         if (textChannel == null) return;
 
         List<MessageEmbed.Field> fields = Arrays.asList(
