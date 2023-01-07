@@ -2,20 +2,26 @@ package lt.tomexas.balticreferral.cmd;
 
 import lt.tomexas.balticreferral.Main;
 import lt.tomexas.balticreferral.utils.PlayerInfo;
+import net.dv8tion.jda.api.entities.EmbedType;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Text;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Random;
+import java.util.*;
 
-public class Commands implements CommandExecutor {
+public class Commands implements CommandExecutor, TabCompleter {
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -47,12 +53,14 @@ public class Commands implements CommandExecutor {
                 if (dupeIPCheck(player.getAddress().getAddress().toString())) player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("used")));
                 else if (discordID.isEmpty())
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("discord_unlinked")));
-                else if (playerInfo.getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("playtime")));
-                else if (referralPlayer.equals(player))
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("self_use")));
                 else if (referralDcId == null)
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("referral_discord_unlinked")));
+                else if (playerInfo.getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("playtime")));
+                else if (referralPInfo.getPlaytime() < Integer.parseInt(Main.getCfg().get("playtime")))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("referral_playtime")));
+                else if (referralPlayer.equals(player))
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("self_use")));
                 else {
                     referralPInfo.setPoints(referralPInfo.getPoints() + 1);
 
@@ -66,13 +74,7 @@ public class Commands implements CommandExecutor {
                     player_used = player_used.replace("%player%", player.getName());
                     referralPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', player_used));
 
-                    // Updates database with new data
-                    try {
-                        for (PlayerInfo info : Main.getPlayerInfo().values())
-                            Main.getDatabase().updatePlayerInfo(info);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    logToDiscord(playerInfo, referralPInfo);
                 }
             }
 
@@ -125,6 +127,49 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getMessages().get("player_only")));
         }
         return false;
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        List<String> list = Arrays.asList("points");
+        String input = args[0].toLowerCase(Locale.ROOT);
+
+        List<String> completions = null;
+        for (String s : list) {
+            if (s.startsWith(input)) {
+                if (completions == null) {
+                    completions = new ArrayList<>();
+                }
+
+                completions.add(s);
+            }
+        }
+
+        if (completions != null) {
+            Collections.sort(completions);
+        }
+
+        return completions;
+    }
+
+    private void logToDiscord(PlayerInfo player, PlayerInfo referralPlayer) {
+        TextChannel textChannel = Main.getBot().getTextChannelById("1060976920768028722");
+        if (textChannel == null) return;
+
+        List<MessageEmbed.Field> fields = Arrays.asList(
+                new MessageEmbed.Field("", "**Inviter:**", false),
+                new MessageEmbed.Field("Player name", referralPlayer.getName(), true),
+                new MessageEmbed.Field("Discord", referralPlayer.getDiscordName(), true),
+
+                new MessageEmbed.Field("", "**Invited:**", false),
+                new MessageEmbed.Field("Player name", player.getName(), true),
+                new MessageEmbed.Field("Discord", player.getDiscordName(), true)
+        );
+        MessageEmbed messageEmbed = new MessageEmbed(
+                null, null, "**A new referral logged with IP: " + player.getIp() + " **", EmbedType.UNKNOWN, null, 0x55FFFF, null, null, null, null, null, null, fields
+        );
+        textChannel.sendMessageEmbeds(messageEmbed).queue();
     }
 
     private String getNewCode() {

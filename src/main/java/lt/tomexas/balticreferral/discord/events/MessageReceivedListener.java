@@ -4,9 +4,9 @@ import lt.tomexas.balticreferral.Main;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import okhttp3.internal.ws.RealWebSocket;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MessageReceivedListener extends ListenerAdapter {
 
@@ -30,14 +31,16 @@ public class MessageReceivedListener extends ListenerAdapter {
                         MessageEmbed messageEmbed = new MessageEmbed(
                                 null, null, Main.getDiscord().get("error_text"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
                         );
-                        event.getMessage().replyEmbeds(messageEmbed).queue();
+                        event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
+                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
                     } else if (checkIfDiscordExistsInDB(event.getAuthor().getId())) {
                         Player player = Bukkit.getPlayer(uuid);
                         if (player == null) return;
                         MessageEmbed messageEmbed = new MessageEmbed(
                                 null, null, Main.getDiscord().get("account_already_linked"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
                         );
-                        event.getMessage().replyEmbeds(messageEmbed).queue();
+                        event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
+                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 
                         Main.getCodes().remove(player.getUniqueId());
                         Bukkit.getScheduler().cancelTask(Main.getTasks().get(player.getUniqueId()));
@@ -50,7 +53,9 @@ public class MessageReceivedListener extends ListenerAdapter {
                         MessageEmbed messageEmbed = new MessageEmbed(
                                 null, null, discord_msg, EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("success_color")), null, null, null, null, null, null, null
                         );
-                        event.getMessage().replyEmbeds(messageEmbed).queue();
+                        event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
+                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+
                         String server_msg = Main.getMessages().get("discord_account_linked_to");
                         server_msg = server_msg.replace("%dc-user%", event.getAuthor().getAsTag());
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', server_msg));

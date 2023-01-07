@@ -58,6 +58,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
 
         this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(), this);
         this.getCommand("ref").setExecutor(new Commands());
+        this.getCommand("ref").setTabCompleter(new Commands());
         this.getCommand("reftop").setExecutor(new Commands());
         this.getCommand("link").setExecutor(new Commands());
 

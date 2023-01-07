@@ -15,6 +15,7 @@ messages:
   discord_unlinked: "%prefix%Please link your Discord account with your minecraft user in order to use the referral system. Use &b/link &7to link your accounts."
   referral_discord_unlinked: "%prefix%The referral player has not yet linked its Discord account to the server."
   playtime: "%prefix%You need to play for atleast &b30minutes&7 to use the referral system."
+  referral_playtime: "%prefix%This player needs to play for atleast &b30minutes&7 to use the referral system."
   self_use: "%prefix%You cannot use your own referral."
   you_used: "%prefix%You used &b%arg_player% &7referral."
   player_used: "%prefix%A player &b%player% &7has used your referral."
