@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import okhttp3.internal.ws.RealWebSocket;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,7 +31,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 null, null, Main.getDiscord().get("error_text"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
-                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+                        event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
                     } else if (checkIfDiscordExistsInDB(event.getAuthor().getId())) {
                         Player player = Bukkit.getPlayer(uuid);
                         if (player == null) return;
@@ -40,7 +39,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 null, null, Main.getDiscord().get("account_already_linked"), EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("error_color")), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
-                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+                        event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
 
                         Main.getCodes().remove(player.getUniqueId());
                         Bukkit.getScheduler().cancelTask(Main.getTasks().get(player.getUniqueId()));
@@ -54,7 +53,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 null, null, discord_msg, EmbedType.UNKNOWN, null, Integer.parseInt(Main.getDiscord().get("success_color")), null, null, null, null, null, null, null
                         );
                         event.getMessage().replyEmbeds(messageEmbed).queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
-                        event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+                        event.getMessage().delete().queueAfter(4, TimeUnit.SECONDS);
 
                         String server_msg = Main.getMessages().get("discord_account_linked_to");
                         server_msg = server_msg.replace("%dc-user%", event.getAuthor().getAsTag());
